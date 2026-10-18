@@ -1,0 +1,28 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+build/
+.turbo/
+coverage/
+
+# Entorno y secretos (NUNCA subir)
+.env
+.env.*
+!.env.example
+.secrets/
+*.pem
+*.key
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# Datos locales
+infra/data/
+uploads/
