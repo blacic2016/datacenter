@@ -9,6 +9,7 @@ import { HistoryPage } from './pages/HistoryPage';
 import { TemplatePage } from './pages/TemplatePage';
 import { UsersPage } from './pages/UsersPage';
 import { SyncPage } from './pages/SyncPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { api, getStoredToken, setStoredToken } from './api/client';
 
 export const App: React.FC = () => {
@@ -124,6 +125,10 @@ export const App: React.FC = () => {
 
         {currentView === 'sync' && (
           <SyncPage />
+        )}
+
+        {currentView === 'settings' && (
+          <SettingsPage />
         )}
       </main>
     </div>

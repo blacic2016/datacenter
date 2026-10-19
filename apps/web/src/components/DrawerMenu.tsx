@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Home, FolderKanban, Eye, History, FileSpreadsheet, Users, Database } from 'lucide-react';
+import { X, Home, FolderKanban, Eye, History, FileSpreadsheet, Users, Database, Settings } from 'lucide-react';
 
 interface DrawerMenuProps {
   isOpen: boolean;
@@ -22,6 +22,7 @@ export const DrawerMenu: React.FC<DrawerMenuProps> = ({
     { id: 'template', label: 'Plantilla Datacenter', icon: FileSpreadsheet, desc: 'Checklist editable y parámetros IA' },
     { id: 'users', label: 'Usuarios y Roles', icon: Users, desc: 'Control de accesos y permisos RBAC' },
     { id: 'sync', label: 'Sincronización BD', icon: Database, desc: 'SQLite local → PostgreSQL en producción' },
+    { id: 'settings', label: 'Configuraciones', icon: Settings, desc: 'Configuración IA (Gemini / Ollama)' },
   ];
 
   return (

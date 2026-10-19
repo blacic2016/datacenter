@@ -104,4 +104,36 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ targetUrl }),
     }),
+
+  // IA (Gemini / Ollama)
+  getAiConfig: () => request<any>('/ai/config'),
+  saveAiConfig: (config: any) =>
+    request<any>('/ai/config', {
+      method: 'POST',
+      body: JSON.stringify(config),
+    }),
+  testAi: () => request<any>('/ai/test', { method: 'POST' }),
+  analyzeRequirement: (text: string, projectName?: string, clientName?: string) =>
+    request<any>('/ai/analyze-requirement', {
+      method: 'POST',
+      body: JSON.stringify({ text, projectName, clientName }),
+    }),
+
+  // Registro fotográfico por áreas
+  getProjectPhotos: (projectId: string, area?: string) => {
+    const q = area && area !== 'all' ? `?area=${encodeURIComponent(area)}` : '';
+    return request<{ photos: any[] }>(`/projects/${projectId}/photos${q}`);
+  },
+  uploadPhoto: (projectId: string, photoData: { area: string; filename?: string; url: string; tag?: string; observation?: string }) =>
+    request<any>(`/projects/${projectId}/photos`, {
+      method: 'POST',
+      body: JSON.stringify(photoData),
+    }),
+  updatePhoto: (photoId: string, data: { tag?: string; observation?: string }) =>
+    request<any>(`/photos/${photoId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  deletePhoto: (photoId: string) =>
+    request<any>(`/photos/${photoId}`, { method: 'DELETE' }),
 };

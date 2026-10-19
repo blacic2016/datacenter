@@ -3,6 +3,7 @@ import { ArrowLeft, Save, CheckCircle, Activity, Shield, AlertTriangle, Layers, 
 import { STEPS, STEP_STATUS_LABEL } from '@daedalous/shared';
 import { api } from '../api/client';
 import { LivePreviewModal } from '../components/LivePreviewModal';
+import { Step01Survey } from './wizard/Step01Survey';
 
 interface WizardPageProps {
   projectId?: string;
@@ -349,6 +350,13 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </button>
               </div>
             </form>
+          ) : activeStepKey === 'step-01' ? (
+            /* Paso 1: Levantamiento Físico, Registro Fotográfico por Áreas y Análisis IA */
+            <Step01Survey
+              project={project}
+              stepData={stepData}
+              onChange={handleFieldChange}
+            />
           ) : activeStepKey === 'step-03' ? (
             /* Paso 3: Planeamiento de Espacio y Racks (Especial con inventario dinámico) */
             <div>
