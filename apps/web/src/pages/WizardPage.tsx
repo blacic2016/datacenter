@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, CheckCircle, Activity, Shield, AlertTriangle, Layers, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, CheckCircle, Activity, Shield, AlertTriangle, Layers, Plus, Trash2, Sparkles } from 'lucide-react';
 import { STEPS, STEP_STATUS_LABEL } from '@daedalous/shared';
 import { api } from '../api/client';
 import { LivePreviewModal } from '../components/LivePreviewModal';
@@ -113,6 +113,84 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
     } finally {
       setSaving(false);
     }
+  };
+
+  const renderRequirementBanner = () => {
+    if (activeStepKey === 'step-00' || activeStepKey === 'step-01') return null;
+
+    const surveyData = allStepsData['step-01'] || (project?.steps as any)?.['step-01']?.data || {};
+    const recs = surveyData.stepRecommendations || {};
+    const clientReq = surveyData.clientRequirement || '';
+    const specificRec = recs[activeStepKey];
+
+    const defaultRecs: Record<string, string> = {
+      'step-02': 'Obra Civil: Dimensionar sala con altura de losa ≥ 3.5m, piso técnico elevado a 30 cm con resistencia de carga ≥ 12 kPa y puerta hermética ≥ 1.0m x 2.13m según TIA-942.',
+      'step-03': 'Espacio y Racks: Respetar pasillos frontales ≥ 1.2m y posteriores ≥ 1.0m con separación clara de pasillo frío y caliente o contención.',
+      'step-04': 'Carga Eléctrica: Dimensionar alimentadores con factor de potencia 0.9 y holgura de crecimiento del 25% a 5 años según la densidad requerida por el cliente.',
+      'step-05': 'Climatización: Garantizar redundancia N+1 en unidades de precisión perimetral y bandejas de condensado bajo piso.',
+      'step-06': 'Tomas Eléctricas: Cada rack debe disponer de doble alimentación A/B independiente con tomas C13/C19 alimentadas desde PDUs separadas.',
+      'step-07': 'Tableros: Tablero general con bypass de mantenimiento, transferencia automática ATS y malla a tierra TMGB.',
+      'step-08': 'UPS: Configuración de UPS redundante con autonomía calculada para soportar transferencia al grupo electrógeno (mínimo 15 minutos).',
+      'step-09': 'Extinción de Incendios: Detección por aspiración tipo VESDA y descarga de agente limpio certificado NFPA 2001 sin residuo conductor.',
+      'step-10': 'Iluminación: Nivel mínimo de 500 lux a 1 metro de altura con respaldo de circuito de emergencia.',
+      'step-11': 'CCTV y Accesos: Cobertura total de pasillos y esclusa con control de acceso por doble factor y retención de 90 días.',
+      'step-12': 'Monitoreo Zabbix: Monitoreo continuo de temperatura, humedad relativa, estado de UPS, PDUs y fallas de ATS.',
+      'step-13': 'Cableado Estructurado: Canalizaciones superiores separadas para fibra óptica y cobre con curvaturas normalizadas TIA-568/942.',
+      'step-14': 'Generador Eléctrico: Grupo electrógeno diésel con tanque de combustible de autonomía continua de al menos 24 a 48 horas.',
+      'step-15': 'Puesta a Tierra: Malla de tierra equipotencial mallada (MCG) con resistencia menor a 5 Ohms conforme a TIA-607-D.',
+      'step-16': 'Comisionamiento: Protocolo de pruebas con banco de carga resistiva y validación de conmutación sin corte.',
+    };
+
+    const currentRec = specificRec || defaultRecs[activeStepKey] || 'Verificar los criterios de diseño TIA-942 correspondientes a este subsistema.';
+
+    return (
+      <div style={{
+        marginBottom: '20px',
+        padding: '16px',
+        background: 'var(--surface-alt)',
+        borderLeft: '4px solid var(--color-primary)',
+        borderRadius: 'var(--radius-md)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sparkles size={16} color="var(--color-primary)" />
+            <strong style={{ fontSize: '13px', color: 'var(--text)' }}>
+              Criterio de Preanálisis del Requerimiento del Cliente (ANSI/TIA-942):
+            </strong>
+          </div>
+          <span className="badge badge-info" style={{ fontSize: '11px' }}>
+            {specificRec ? 'Analizado por IA' : 'Norma TIA-942 Guía'}
+          </span>
+        </div>
+
+        <p style={{ fontSize: '12px', color: 'var(--text)', margin: 0, lineHeight: 1.5 }}>
+          {currentRec}
+        </p>
+
+        {clientReq && (
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', borderTop: '1px dashed var(--border)', paddingTop: '6px' }}>
+            <strong>Requerimiento base del cliente:</strong> "{clientReq.substring(0, 160)}{clientReq.length > 160 ? '...' : ''}"
+          </div>
+        )}
+
+        <div style={{ marginTop: '4px' }}>
+          <label className="form-label" style={{ fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
+            Observación técnica de diseño para esta fase (Tomando en cuenta este requerimiento):
+          </label>
+          <textarea
+            className="form-textarea"
+            rows={2}
+            style={{ fontSize: '12px' }}
+            placeholder="Registre las observaciones, justificaciones o adaptaciones técnicas específicas para este paso..."
+            value={stepData.stepObservation || ''}
+            onChange={(e) => handleFieldChange('stepObservation', e.target.value)}
+          />
+        </div>
+      </div>
+    );
   };
 
   const activeStepMeta = STEPS.find((s) => s.key === activeStepKey);
@@ -357,9 +435,14 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
               stepData={stepData}
               onChange={handleFieldChange}
             />
-          ) : activeStepKey === 'step-03' ? (
-            /* Paso 3: Planeamiento de Espacio y Racks (Especial con inventario dinámico) */
+          ) : (
             <div>
+              {/* Observación y Criterio de Preanálisis del Requerimiento */}
+              {renderRequirementBanner()}
+
+              {activeStepKey === 'step-03' ? (
+                /* Paso 3: Planeamiento de Espacio y Racks (Especial con inventario dinámico) */
+                <div>
               <div style={{ marginBottom: '16px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '700' }}>Paso 3 · Planeamiento del Espacio e Inventario de Racks</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -590,7 +673,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
             </div>
           )}
         </div>
-      </div>
+      )}
+    </div>
+  </div>
 
       {/* Pop-up en Vivo flotante reactivo */}
       <LivePreviewModal
