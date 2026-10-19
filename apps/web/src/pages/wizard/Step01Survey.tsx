@@ -62,6 +62,7 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
         if (a.expectedKwPerRack) onChange('expectedKwPerRack', a.expectedKwPerRack);
         if (a.precheckItems) onChange('aiExplanations', a.precheckItems);
         if (a.stepRecommendations) onChange('stepRecommendations', a.stepRecommendations);
+        if (a.findings) onChange('aiFindings', a.findings);
         setBottomTab('preanalysis');
       }
       if (res.notice) setAiNotice(res.notice);
@@ -219,14 +220,73 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: '700' }}>
-                Preanálisis de Diseño · Distribución Cuantitativa del Requerimiento
+                Preanálisis de Diseño · Hallazgos y Criterios TIA-942 Extraídos por IA
               </h3>
               <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Desglose analítico de lo solicitado por el cliente. Estos criterios se presentarán automáticamente en cada fase de diseño como observación guía.
+                Desglose analítico de lo solicitado por el cliente. Cada hallazgo se transfiere directamente a su fase de diseño correspondiente.
               </p>
             </div>
             <span className="badge badge-success">TIA-942-C · Rated {stepData.suggestedRated || project?.rated_target || 2}</span>
           </div>
+
+          {/* Hallazgos específicos extraídos del texto del cliente */}
+          {stepData.aiFindings && (
+            <div style={{ marginBottom: '20px', padding: '14px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '13px', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={16} color="var(--color-primary)" />
+                <span>Hallazgos del Requerimiento Asignados por Subsistema:</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-primary)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>🖥️ Racks y Espacio</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Paso 03</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.racksSummary}</div>
+                </div>
+
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-info)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>⚡ Carga IT y Energía</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Paso 04</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.powerSummary}</div>
+                </div>
+
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-warning)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>🔋 Sistema UPS y Baterías</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Paso 08</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.upsSummary}</div>
+                </div>
+
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-success)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>❄️ Climatización</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Paso 05</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.coolingSummary}</div>
+                </div>
+
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-primary)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>🏢 Edificación y Obra Civil</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Paso 02</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.civilSummary}</div>
+                </div>
+
+                <div style={{ padding: '10px', background: 'var(--surface)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-info)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
+                    <strong>🔌 Tomas Eléctricas y Tableros</strong>
+                    <span className="badge badge-info" style={{ fontSize: '9px' }}>Aplica a Pasos 06 y 07</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text)' }}>{stepData.aiFindings.electricalSummary}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Métricas clave calculadas del requerimiento */}
           {(() => {

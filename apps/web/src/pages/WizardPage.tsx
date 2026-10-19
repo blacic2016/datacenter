@@ -498,31 +498,58 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
               </div>
 
               {/* Racks e inventario */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <h4 style={{ fontSize: '14px', fontWeight: '600' }}>
                   Racks en Sala ({(stepData.racks || []).length})
                 </h4>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => {
-                    const current = stepData.racks || [];
-                    const newRack = {
-                      id: `rack-${current.length + 1}`,
-                      name: `RACK-${String(current.length + 1).padStart(2, '0')}`,
-                      units: 42,
-                      row: 1,
-                      position: current.length + 1,
-                      equipment: [
-                        { id: `eq-1`, name: 'Servidor 2U Dual PSU', units: 2, watts: 450, powerSupplies: 2, quantity: 4 },
-                        { id: `eq-2`, name: 'Switch ToR 1U', units: 1, watts: 150, powerSupplies: 2, quantity: 2 },
-                      ],
-                    };
-                    handleFieldChange('racks', [...current, newRack]);
-                  }}
-                >
-                  <Plus size={14} /> Agregar Rack a la Sala
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    title="Poblar inventario según el número de racks analizados por la IA en el Paso 1"
+                    onClick={() => {
+                      const surveyData = allStepsData['step-01'] || (project?.steps as any)?.['step-01']?.data || {};
+                      const expected = Number(surveyData.expectedRacks || 4);
+                      const kwPerRack = Number(surveyData.expectedKwPerRack || 5.0);
+                      const genRacks = Array.from({ length: expected }).map((_, i) => ({
+                        id: `rack-${i + 1}`,
+                        name: `RACK-${String(i + 1).padStart(2, '0')}`,
+                        units: 42,
+                        row: 1,
+                        position: i + 1,
+                        equipment: [
+                          { id: `eq-${i}-1`, name: 'Servidor Blade 2U', units: 2, watts: Math.round(kwPerRack * 1000 * 0.45), powerSupplies: 2, quantity: 2 },
+                          { id: `eq-${i}-2`, name: 'Switch ToR 1U', units: 1, watts: 250, powerSupplies: 2, quantity: 2 },
+                        ],
+                      }));
+                      handleFieldChange('racks', genRacks);
+                    }}
+                  >
+                    <Sparkles size={14} color="var(--color-primary)" />
+                    <span>Cargar {allStepsData['step-01']?.expectedRacks || 4} Racks del Requerimiento</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      const current = stepData.racks || [];
+                      const newRack = {
+                        id: `rack-${current.length + 1}`,
+                        name: `RACK-${String(current.length + 1).padStart(2, '0')}`,
+                        units: 42,
+                        row: 1,
+                        position: current.length + 1,
+                        equipment: [
+                          { id: `eq-1`, name: 'Servidor 2U Dual PSU', units: 2, watts: 450, powerSupplies: 2, quantity: 4 },
+                          { id: `eq-2`, name: 'Switch ToR 1U', units: 1, watts: 150, powerSupplies: 2, quantity: 2 },
+                        ],
+                      };
+                      handleFieldChange('racks', [...current, newRack]);
+                    }}
+                  >
+                    <Plus size={14} /> Agregar Rack
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
