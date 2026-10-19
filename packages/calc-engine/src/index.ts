@@ -9,3 +9,4 @@ export * from './nodes/capacity';
 export * from './nodes/electrical';
 export * from './nodes/space';
 export * from './rules/limits';
+export * from './rules/step-completion';

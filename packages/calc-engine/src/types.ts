@@ -30,4 +30,7 @@ export interface EngineOutput {
   results: NodeResults;
   diagnostics: Diagnostic[];
   compliance: Record<string, number | null>;
+  globalProgress?: number;
+  completedStepsCount?: number;
+  missingRequirements?: Record<string, string[]>;
 }

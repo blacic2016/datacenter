@@ -10,6 +10,7 @@ import { coolingNode, upsNode } from './nodes/capacity';
 import { electricalNode } from './nodes/electrical';
 import { heightNode, lightingNode, spaceNode } from './nodes/space';
 import { RULES } from './rules/limits';
+import { evaluateStepRequirements } from './rules/step-completion';
 
 export class CalcEngine {
   private readonly nodes: Map<string, CalcNode> = new Map();
@@ -95,23 +96,54 @@ export class CalcEngine {
       }
     }
 
-    // 3. Calcular compliance score por paso (100 - penalizaciones, mín 0)
+    // 3. Calcular compliance score por paso y progreso global del diseño
     const compliance: Record<string, number | null> = {};
+    const missingRequirements: Record<string, string[]> = {};
+    let totalScoreSum = 0;
+    let completedStepsCount = 0;
+
     for (let i = 0; i <= 16; i++) {
       const stepKey = `step-${String(i).padStart(2, '0')}`;
-      if (!data[stepKey] || Object.keys(data[stepKey] || {}).length === 0) {
-        compliance[stepKey] = null; // Aún sin datos
+      const stepData = (data[stepKey] as Record<string, any>) || {};
+
+      if (!data[stepKey] || Object.keys(stepData).length === 0) {
+        compliance[stepKey] = 0;
+        const evalReqs = evaluateStepRequirements(stepKey, {}, data);
+        missingRequirements[stepKey] = evalReqs.missing;
         continue;
       }
+
+      // Evaluar requisitos de completitud específicos de la fase
+      const evalReqs = evaluateStepRequirements(stepKey, stepData, data);
+      missingRequirements[stepKey] = evalReqs.missing;
+
+      // Penalizaciones normativas TIA-942
       const stepDiags = diagnostics.filter((d) => d.stepKey === stepKey);
-      let score = 100;
+      let penalty = 0;
       for (const d of stepDiags) {
-        score -= SEVERITY_PENALTY[d.severity] ?? 0;
+        penalty += SEVERITY_PENALTY[d.severity] ?? 0;
       }
-      compliance[stepKey] = Math.max(0, score);
+
+      // El score es la completitud de requisitos menos las penalizaciones normativas
+      const finalScore = Math.max(0, evalReqs.score - penalty);
+      compliance[stepKey] = finalScore;
+      totalScoreSum += finalScore;
+
+      if (finalScore === 100) {
+        completedStepsCount++;
+      }
     }
 
-    return { results, diagnostics, compliance };
+    const globalProgress = Math.round(totalScoreSum / 17);
+
+    return {
+      results,
+      diagnostics,
+      compliance,
+      globalProgress,
+      completedStepsCount,
+      missingRequirements,
+    };
   }
 }
 

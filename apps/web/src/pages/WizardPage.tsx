@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, CheckCircle, Activity, Shield, AlertTriangle, Layers, Plus, Trash2, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, CheckCircle, Activity, Shield, AlertTriangle, Layers, Plus, Trash2, Sparkles, Award, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { STEPS, STEP_STATUS_LABEL } from '@daedalous/shared';
 import { api } from '../api/client';
 import { LivePreviewModal } from '../components/LivePreviewModal';
@@ -113,6 +113,254 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
     } finally {
       setSaving(false);
     }
+  };
+
+  const currentIndex = STEPS.findIndex((s) => s.key === activeStepKey);
+  const prevStep = currentIndex > 0 ? STEPS[currentIndex - 1] : null;
+  const nextStep = currentIndex < STEPS.length - 1 ? STEPS[currentIndex + 1] : null;
+
+  const goToStep = (key: string) => {
+    setActiveStepKey(key);
+    const saved = allStepsData[key] || {};
+    setStepData(saved);
+    triggerLiveEval(saved);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNextStep = async () => {
+    if (saving) return;
+    if (project?.activeVersion?.id && activeStepKey !== 'step-00') {
+      await handleSaveStep();
+    }
+    if (nextStep) {
+      goToStep(nextStep.key);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (prevStep) {
+      goToStep(prevStep.key);
+    }
+  };
+
+  const renderGlobalProgressBar = () => {
+    if (!project) return null;
+
+    const globalScore = calcOutput?.globalProgress ?? 0;
+    const completedCount = calcOutput?.completedStepsCount ?? 0;
+
+    return (
+      <div
+        className="card"
+        style={{
+          marginBottom: '20px',
+          padding: '16px 20px',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Award size={20} color="var(--color-primary)" />
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text)' }}>
+                Progreso Global del Diseño del Data Center (ANSI/TIA-942)
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                Cada una de las 17 fases completadas al 100% aporta proporcionalmente (~5.88%) al diseño integral.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              <strong>{completedCount}</strong> de 17 fases al 100%
+            </span>
+            <span
+              className={`badge ${globalScore === 100 ? 'badge-success' : 'badge-info'}`}
+              style={{ fontSize: '14px', fontWeight: '800', padding: '4px 10px' }}
+            >
+              {globalScore}% Global
+            </span>
+          </div>
+        </div>
+
+        <div style={{ width: '100%', height: '8px', background: 'var(--surface-alt)', borderRadius: '4px', overflow: 'hidden' }}>
+          <div
+            style={{
+              width: `${Math.min(globalScore, 100)}%`,
+              height: '100%',
+              background: globalScore === 100
+                ? 'var(--color-success)'
+                : 'linear-gradient(90deg, var(--color-primary), #6366f1)',
+              transition: 'width 0.4s ease',
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderStepComplianceCard = () => {
+    if (!project && activeStepKey === 'step-00') return null;
+
+    const score = calcOutput?.compliance?.[activeStepKey] ?? 0;
+    const missing: string[] = calcOutput?.missingRequirements?.[activeStepKey] || [];
+    const isCompleted = score === 100;
+
+    return (
+      <div
+        style={{
+          marginBottom: '18px',
+          padding: '14px 16px',
+          borderRadius: 'var(--radius-md)',
+          background: isCompleted ? 'rgba(34, 197, 94, 0.08)' : 'var(--surface-alt)',
+          border: `1px solid ${isCompleted ? 'rgba(34, 197, 94, 0.35)' : 'var(--border)'}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isCompleted ? (
+              <CheckCircle size={18} color="var(--color-success)" />
+            ) : (
+              <AlertTriangle size={18} color="var(--color-warning)" />
+            )}
+            <strong style={{ fontSize: '13px', color: 'var(--text)' }}>
+              Cumplimiento Técnico de la Fase:
+            </strong>
+            <span
+              className={`badge ${isCompleted ? 'badge-success' : 'badge-warning'}`}
+              style={{ fontSize: '12px', fontWeight: '700' }}
+            >
+              {score}% {isCompleted ? 'Completado' : 'En Progreso'}
+            </span>
+          </div>
+
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+            Aporte de esta fase al diseño global: ~5.88%
+          </span>
+        </div>
+
+        {/* Barra de progreso de la fase */}
+        <div style={{ width: '100%', height: '6px', background: 'var(--surface)', borderRadius: '3px', overflow: 'hidden' }}>
+          <div
+            style={{
+              width: `${Math.min(score, 100)}%`,
+              height: '100%',
+              background: isCompleted ? 'var(--color-success)' : 'var(--color-primary)',
+              transition: 'width 0.3s ease',
+            }}
+          />
+        </div>
+
+        {/* Lista de requisitos pendientes o felicitación */}
+        {isCompleted ? (
+          <div style={{ fontSize: '12px', color: 'var(--color-success)', fontWeight: '600' }}>
+            ✓ Todos los requisitos normativos y técnicos de esta fase han sido completados satisfactoriamente.
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '4px' }}>
+              Requisitos obligatorios para alcanzar el 100% de esta fase:
+            </div>
+            {missing.length > 0 ? (
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text)', lineHeight: '1.6' }}>
+                {missing.map((reqText, idx) => (
+                  <li key={idx}>
+                    {reqText}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                Complete los campos técnicos requeridos y verifique que no existan inconsistencias normativas.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderStepNavigationFooter = () => {
+    const isFirst = currentIndex <= 0;
+    const isLast = currentIndex === STEPS.length - 1;
+    const missing = calcOutput?.missingRequirements?.[activeStepKey] || [];
+
+    return (
+      <div
+        style={{
+          marginTop: '28px',
+          paddingTop: '16px',
+          borderTop: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={handlePrevStep}
+          disabled={isFirst}
+          style={{ opacity: isFirst ? 0.5 : 1 }}
+        >
+          <ChevronLeft size={16} />
+          <span>Paso Anterior: {prevStep ? prevStep.title : 'Inicio'}</span>
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {project && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSaveStep}
+              disabled={saving}
+            >
+              <Save size={16} />
+              <span>{saving ? 'Guardando...' : 'Guardar Avance'}</span>
+            </button>
+          )}
+
+          {!isLast ? (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleNextStep}
+              disabled={saving}
+              title={missing.length > 0 ? `Requisitos pendientes: ${missing.length}` : 'Avanzar a la siguiente fase'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: '600',
+              }}
+            >
+              <span>{saving ? 'Guardando...' : `Siguiente: ${nextStep?.title || 'Siguiente Paso'}`}</span>
+              <ChevronRight size={16} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={handleValidateStep}
+              disabled={saving}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
+            >
+              <CheckCircle size={16} />
+              <span>Validar y Finalizar Data Center</span>
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const renderRequirementBanner = () => {
@@ -267,6 +515,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
         </div>
       )}
 
+      {/* Barra de Progreso Global del Diseño Data Center */}
+      {renderGlobalProgressBar()}
+
       {/* Grid: Stepper a la izquierda (17 pasos) y Contenido de la fase a la derecha */}
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '20px' }}>
         {/* Stepper Vertical */}
@@ -278,6 +529,7 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
             const isCurrent = st.key === activeStepKey;
             const isLocked = !project && st.key !== 'step-00';
             const score = calcOutput?.compliance?.[st.key];
+            const isCompleted = score === 100;
             return (
               <button
                 key={st.key}
@@ -302,7 +554,7 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-primary)', width: '18px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: isCompleted ? 'var(--color-success)' : 'var(--color-primary)', width: '18px' }}>
                     {st.number}
                   </span>
                   <span style={{ fontSize: '13px', fontWeight: isCurrent ? '600' : '400', color: 'var(--text)' }}>
@@ -310,8 +562,19 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                   </span>
                 </div>
                 {score !== undefined && score !== null && (
-                  <span style={{ fontSize: '10px', fontWeight: '700' }} className="font-mono">
-                    {score}%
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      background: isCompleted ? 'rgba(34, 197, 94, 0.15)' : 'var(--surface)',
+                      color: isCompleted ? 'var(--color-success)' : 'var(--text-muted)',
+                      border: `1px solid ${isCompleted ? 'rgba(34, 197, 94, 0.3)' : 'transparent'}`
+                    }}
+                    className="font-mono"
+                  >
+                    {isCompleted ? '✓ 100%' : `${score}%`}
                   </span>
                 )}
               </button>
@@ -428,17 +691,69 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </button>
               </div>
             </form>
-          ) : activeStepKey === 'step-01' ? (
-            /* Paso 1: Levantamiento Físico, Registro Fotográfico por Áreas y Análisis IA */
-            <Step01Survey
-              project={project}
-              stepData={stepData}
-              onChange={handleFieldChange}
-            />
           ) : (
             <div>
-              {/* Observación y Criterio de Preanálisis del Requerimiento */}
-              {renderRequirementBanner()}
+              {/* Tarjeta de Cumplimiento Técnico de la Fase */}
+              {renderStepComplianceCard()}
+
+              {activeStepKey === 'step-00' ? (
+                /* Paso 0 cuando el proyecto ya está creado (Sellado) */
+                <div>
+                  <div style={{ marginBottom: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <CheckCircle size={20} color="var(--color-success)" />
+                      <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text)', margin: 0 }}>
+                        Paso 0 · Datos Generales del Proyecto (Sellado e Inmutable)
+                      </h3>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                      Este proyecto ha sido sellado y sus parámetros base están registrados bajo el estándar TIA-942.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '20px' }}>
+                    <div className="card" style={{ padding: '14px', background: 'var(--surface-alt)' }}>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>Nombre del Proyecto</div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', marginTop: '4px', color: 'var(--text)' }}>
+                        {project?.generalData?.projectName || project?.name || 'Data Center'}
+                      </div>
+                    </div>
+
+                    <div className="card" style={{ padding: '14px', background: 'var(--surface-alt)' }}>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>Cliente</div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', marginTop: '4px', color: 'var(--text)' }}>
+                        {project?.client_name || project?.generalData?.clientName || 'Cliente'}
+                      </div>
+                    </div>
+
+                    <div className="card" style={{ padding: '14px', background: 'var(--surface-alt)' }}>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>Código de Proyecto</div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', marginTop: '4px', color: 'var(--color-primary)' }} className="font-mono">
+                        {project?.code}
+                      </div>
+                    </div>
+
+                    <div className="card" style={{ padding: '14px', background: 'var(--surface-alt)' }}>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: '600' }}>Nivel de Fiabilidad Objetivo</div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', marginTop: '4px', color: 'var(--text)' }}>
+                        <span className="badge badge-info" style={{ fontSize: '13px' }}>
+                          Rated {project?.rated_target || 2} (TIA-942)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : activeStepKey === 'step-01' ? (
+                /* Paso 1: Levantamiento Físico, Registro Fotográfico por Áreas y Análisis IA */
+                <Step01Survey
+                  project={project}
+                  stepData={stepData}
+                  onChange={handleFieldChange}
+                />
+              ) : (
+                <div>
+                  {/* Observación y Criterio de Preanálisis del Requerimiento */}
+                  {renderRequirementBanner()}
 
               {activeStepKey === 'step-03' ? (
                 /* Paso 3: Planeamiento de Espacio y Racks (Especial con inventario dinámico) */
@@ -701,8 +1016,13 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
           )}
         </div>
       )}
+
+      {/* Botones de Navegación del Asistente (Paso Anterior / Guardar / Siguiente) */}
+      {renderStepNavigationFooter()}
     </div>
-  </div>
+  )}
+</div>
+</div>
 
       {/* Pop-up en Vivo flotante reactivo */}
       <LivePreviewModal
