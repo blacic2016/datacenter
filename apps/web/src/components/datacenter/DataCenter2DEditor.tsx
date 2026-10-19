@@ -470,7 +470,9 @@ export const DataCenter2DEditor: React.FC<DataCenter2DEditorProps> = ({
           {selectedElement ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '11px' }}>Nombre / Etiqueta</label>
+                <label className="form-label" style={{ fontSize: '11px', fontWeight: '700' }}>
+                  <strong>Nombre / Etiqueta</strong> <span className="required-asterisk">*</span>
+                </label>
                 <input
                   type="text"
                   className="form-input"
@@ -610,7 +612,9 @@ export const DataCenter2DEditor: React.FC<DataCenter2DEditorProps> = ({
               {/* Características específicas según subsistema */}
               {selectedElement.type === 'rack' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '11px' }}>Carga IT (kW)</label>
+                  <label className="form-label" style={{ fontSize: '11px', fontWeight: '700' }}>
+                    <strong>Carga IT (kW)</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="0.5"
@@ -627,7 +631,9 @@ export const DataCenter2DEditor: React.FC<DataCenter2DEditorProps> = ({
 
               {selectedElement.type === 'ups' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '11px' }}>Capacidad UPS (kVA)</label>
+                  <label className="form-label" style={{ fontSize: '11px', fontWeight: '700' }}>
+                    <strong>Capacidad UPS (kVA)</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="10"
@@ -644,7 +650,9 @@ export const DataCenter2DEditor: React.FC<DataCenter2DEditorProps> = ({
 
               {selectedElement.type === 'crac' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '11px' }}>Capacidad Frigorífica (BTU/h)</label>
+                  <label className="form-label" style={{ fontSize: '11px', fontWeight: '700' }}>
+                    <strong>Capacidad Frigorífica (BTU/h)</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="10000"

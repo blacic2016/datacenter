@@ -131,6 +131,9 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
         </div>
 
         <div className="form-group">
+          <label className="form-label">
+            <strong>Requerimiento Escrito del Cliente</strong> <span className="required-asterisk">*</span>
+          </label>
           <textarea
             className="form-textarea"
             rows={4}
@@ -148,7 +151,9 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           <div className="form-group">
-            <label className="form-label">Racks Esperados (Estimado IA)</label>
+            <label className="form-label">
+              <strong>Racks Esperados (Estimado IA)</strong> <span className="required-asterisk">*</span>
+            </label>
             <input
               type="number"
               className="form-input"
@@ -157,7 +162,9 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Densidad por Rack (kW)</label>
+            <label className="form-label">
+              <strong>Densidad por Rack (kW)</strong> <span className="required-asterisk">*</span>
+            </label>
             <input
               type="number"
               step="0.5"
@@ -167,7 +174,9 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Horizonte Crecimiento (Años)</label>
+            <label className="form-label">
+              <strong>Horizonte Crecimiento (Años)</strong> <span className="required-asterisk">*</span>
+            </label>
             <input
               type="number"
               className="form-input"
@@ -178,7 +187,9 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
         </div>
 
         <div className="form-group" style={{ marginBottom: 0 }}>
-          <label className="form-label">Propuesta Técnica Fundamentada en TIA-942</label>
+          <label className="form-label">
+            <strong>Propuesta Técnica Fundamentada en TIA-942</strong> <span className="required-asterisk">*</span>
+          </label>
           <textarea
             className="form-textarea"
             rows={3}
@@ -503,13 +514,18 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
                 <input type="file" multiple accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
               </label>
             </div>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Observación general para este grupo de fotos..."
-              value={groupObservation}
-              onChange={(e) => setGroupObservation(e.target.value)}
-            />
+            <div>
+              <label className="form-label" style={{ fontSize: '12px', marginBottom: '4px' }}>
+                <strong>Observación general para este grupo de fotos</strong> <span className="required-asterisk">*</span>
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Observación general para este grupo de fotos..."
+                value={groupObservation}
+                onChange={(e) => setGroupObservation(e.target.value)}
+              />
+            </div>
           </div>
 
           {loadingPhotos ? (
@@ -533,11 +549,21 @@ export const Step01Survey: React.FC<Step01SurveyProps> = ({ project, stepData, o
                     <span className="badge badge-info"><User size={10} /> {p.autoTags?.clientName}</span>
                     <span className="badge badge-info"><Calendar size={10} /> {p.autoTags?.uploadDate}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Tag size={12} color="var(--color-primary)" />
-                    <input type="text" className="form-input" style={{ fontSize: '12px', padding: '4px 8px' }} defaultValue={p.tag} />
+                  <div>
+                    <label className="form-label" style={{ fontSize: '11px', marginBottom: '2px' }}>
+                      <strong>Tag / Identificador</strong> <span className="required-asterisk">*</span>
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Tag size={12} color="var(--color-primary)" />
+                      <input type="text" className="form-input" style={{ fontSize: '12px', padding: '4px 8px' }} defaultValue={p.tag} />
+                    </div>
                   </div>
-                  <input type="text" className="form-input" style={{ fontSize: '11px', padding: '4px 8px' }} defaultValue={p.observation} placeholder="Observación..." />
+                  <div>
+                    <label className="form-label" style={{ fontSize: '11px', marginBottom: '2px' }}>
+                      <strong>Observación de la fotografía</strong> <span className="required-asterisk">*</span>
+                    </label>
+                    <input type="text" className="form-input" style={{ fontSize: '11px', padding: '4px 8px' }} defaultValue={p.observation} placeholder="Observación..." />
+                  </div>
                 </div>
               ))}
             </div>

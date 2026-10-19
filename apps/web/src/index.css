@@ -164,9 +164,17 @@ button {
 .form-label {
   display: block;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700 !important;
   margin-bottom: 6px;
   color: var(--text);
+}
+
+.required-asterisk,
+.form-label .asterisk {
+  color: var(--color-danger, #ef4444);
+  font-weight: 900;
+  margin-left: 3px;
+  display: inline-block;
 }
 
 .form-input, .form-select, .form-textarea {

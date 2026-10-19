@@ -425,8 +425,8 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
         )}
 
         <div style={{ marginTop: '4px' }}>
-          <label className="form-label" style={{ fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>
-            Observación técnica de diseño para esta fase (Tomando en cuenta este requerimiento):
+          <label className="form-label" style={{ fontSize: '12px', fontWeight: '700', marginBottom: '4px' }}>
+            <strong>Observación técnica de diseño para esta fase (Tomando en cuenta este requerimiento)</strong> <span className="required-asterisk">*</span>
           </label>
           <textarea
             className="form-textarea"
@@ -598,7 +598,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className="form-group">
-                  <label className="form-label">Nombre del Proyecto *</label>
+                  <label className="form-label">
+                    <strong>Nombre del Proyecto</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -610,7 +612,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Nombre del Cliente *</label>
+                  <label className="form-label">
+                    <strong>Nombre del Cliente</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -622,7 +626,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Nivel Rated Objetivo TIA-942 *</label>
+                  <label className="form-label">
+                    <strong>Nivel Rated Objetivo TIA-942</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <select
                     className="form-select"
                     value={step0Form.ratedTarget}
@@ -636,7 +642,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Preventa / Responsable Técnico *</label>
+                  <label className="form-label">
+                    <strong>Preventa / Responsable Técnico</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -648,7 +656,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Encargado por parte del Cliente *</label>
+                  <label className="form-label">
+                    <strong>Encargado por parte del Cliente</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -660,7 +670,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Teléfono de Contacto *</label>
+                  <label className="form-label">
+                    <strong>Teléfono de Contacto</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -672,7 +684,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                 </div>
 
                 <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                  <label className="form-label">Dirección del Levantamiento *</label>
+                  <label className="form-label">
+                    <strong>Dirección del Levantamiento</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="text"
                     required
@@ -767,7 +781,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
                 <div className="form-group">
-                  <label className="form-label">Pasillo Frontal (m)</label>
+                  <label className="form-label">
+                    <strong>Pasillo Frontal (m)</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="0.1"
@@ -777,7 +793,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Pasillo Posterior (m)</label>
+                  <label className="form-label">
+                    <strong>Pasillo Posterior (m)</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="0.1"
@@ -787,7 +805,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Contención</label>
+                  <label className="form-label">
+                    <strong>Contención</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <select
                     className="form-select"
                     value={stepData.containment ?? 'ninguna'}
@@ -799,7 +819,9 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Factor Simultaneidad</label>
+                  <label className="form-label">
+                    <strong>Factor Simultaneidad</strong> <span className="required-asterisk">*</span>
+                  </label>
                   <input
                     type="number"
                     step="0.05"
@@ -931,7 +953,7 @@ export const WizardPage: React.FC<WizardPageProps> = ({ projectId, onBack, onOpe
                       return (
                         <div key={f.key} className="form-group" style={{ gridColumn: f.type === 'textarea' || f.type === 'checklist' ? '1 / -1' : undefined }}>
                           <label className="form-label">
-                            {f.label} {f.unit ? `(${f.unit})` : ''} {f.required ? '*' : ''}
+                            <strong>{f.label}</strong> {f.unit ? `(${f.unit})` : ''} <span className="required-asterisk">*</span>
                           </label>
 
                           {f.type === 'select' ? (
