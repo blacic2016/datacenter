@@ -181,9 +181,9 @@ export const SettingsPage: React.FC = () => {
                     value={config.geminiModel}
                     onChange={(e) => setConfig({ ...config, geminiModel: e.target.value })}
                   >
-                    <option value="gemini-1.5-flash">gemini-1.5-flash (Recomendado - Ultra rápido)</option>
+                    <option value="gemini-3.8-flash">gemini-3.8-flash (Recomendado - Última generación)</option>
+                    <option value="gemini-1.5-flash">gemini-1.5-flash (Ultra rápido y ligero)</option>
                     <option value="gemini-1.5-pro">gemini-1.5-pro (Máxima capacidad de razonamiento)</option>
-                    <option value="gemini-2.0-flash">gemini-2.0-flash (Próxima generación)</option>
                   </select>
                 </div>
               </div>

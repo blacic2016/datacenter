@@ -33,7 +33,11 @@ export function saveAiConfig(cfg: Partial<AiConfig>): void {
   );
 }
 
-async function callGemini(prompt: string, apiKey: string, model: string): Promise<string> {
+async function callGemini(prompt: string, apiKey: string, rawModel: string): Promise<string> {
+  let model = rawModel || 'gemini-3.8-flash';
+  if (model === 'gemini-2.0-flash') {
+    model = 'gemini-3.8-flash';
+  }
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
@@ -45,6 +49,10 @@ async function callGemini(prompt: string, apiKey: string, model: string): Promis
   });
   if (!res.ok) {
     const errText = await res.text();
+    if (res.status === 404 && model !== 'gemini-1.5-flash') {
+      console.warn(`Modelo ${model} no disponible (HTTP 404), ejecutando con fallback a gemini-1.5-flash...`);
+      return callGemini(prompt, apiKey, 'gemini-1.5-flash');
+    }
     throw new Error(`Error Gemini HTTP ${res.status}: ${errText}`);
   }
   const data = await res.json();
